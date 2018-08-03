@@ -10,6 +10,7 @@ class Client(object):
         self.stat = stat(requester)
         self.stats = stats(requester)
         self.allocation = allocation(requester)
+        self.stream = stream(requester)
 
     def __str__(self):
         return "{0}".format(self.__dict__)
@@ -186,3 +187,36 @@ class allocation(Client):
               - nomad.api.exceptions.URLNotFoundNomadException
         """
         return self._get(allocation.ENDPOINT, id, "stats")
+
+
+
+class stream(Client):
+
+    LOGS_ENDPOINT = "fs/logs"
+
+    def __init__(self, requester):
+        self._requester = requester
+
+    def logs(self, alloc_id, task, follow=False, type="stdout", offset=0, origin="start", plain=False):
+        """
+            The /client/fs/logs/:alloc_id endpoint streams the stdout/stderr logs from an allocation.
+
+            https://www.nomadproject.io/api/client.html#stream-logs
+
+            arguments
+             - alloc_id
+             - task
+             - follow
+             - type
+             - offset
+             - origin
+             - plain
+            returns: list
+            raises:
+              - nomad.api.exceptions.BaseNomadException
+              - nomad.api.exceptions.URLNotFoundNomadException
+        """
+        return self._get(
+            stream.LOGS_ENDPOINT, id, task=task, follow=follow, 
+            type=type, offset=offset, origin=origin
+        )
